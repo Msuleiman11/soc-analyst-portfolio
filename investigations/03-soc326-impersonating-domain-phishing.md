@@ -27,6 +27,8 @@ action was taken in the intervening period.
 | 18 Sep, 13:32:13 | Connection from 172.16.17.162 to 45.33.23.183:443, user Mateo. Action: Allowed | Network log |
 | 18 Sep, 13:32 | Second connection to same destination, different source port | Network log |
 
+![Email Security showing both messages 20 hours apart](Images/Screenshot%202026-08-03%20204412.png)
+
 ## The warning
 
 The initial alert was not an attack. It was a Digital Risk Protection feed
@@ -72,6 +74,8 @@ inspects hyperlinks, since a user can copy and paste it manually. And the
 link is HTTP rather than HTTPS, which is a minor tell but inconsistent with
 a legitimate corporate communication.
 
+![Phishing email impersonating LetsDefend branding](Images/Screenshot%202026-08-03%20204317.png)
+
 The email was targeted rather than bulk. A search of Email Security across
 the period returned only this message and the CTI alert.
 
@@ -83,6 +87,8 @@ letsdefwnd[.]io. Device action was Allowed.
 
 A second connection to the same destination followed from a different source
 port.
+
+![Network log showing the allowed outbound connection from Mateo's host](Images/Screenshot%202026-08-03%20204647.png)
 
 What this establishes: the user clicked the link, the connection completed,
 and no control blocked it.
