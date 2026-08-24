@@ -24,6 +24,6 @@ an initial read didn't hold is part of the analysis.
 ## About
 
 Cybersecurity graduate (BSc, University of Bedfordshire) working toward
-a SOC analyst role. eJPTv2 certified, Security+ in progress.
+a SOC analyst role. eJPTv2 and Security+ 701 certified.  
 
 [LinkedIn](https://www.linkedin.com/in/mohammad-suleiman-367a23201/) · suleiman.mohammad1@outlook.com
