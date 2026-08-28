@@ -78,7 +78,7 @@ ProcessEvents
 
 **Result:** activity beginning **17 June 2024 at 14:23:25** showing patient data being collected and staged for encryption. This established `AMFB-MACHINE` as patient zero.
 
-![Process events on AMFB-MACHINE](investigations/Images/Screenshot 2026-08-28 122646.png)
+![Process events on AMFB-MACHINE](investigations/Images/amfb-machine-process-events.png)
 ---
 
 ## 5. The ransomware binary
