@@ -7,7 +7,7 @@ Building a working SIEM from scratch, monitoring a live endpoint, and investigat
 
 ## The lab
 
-![Lab architecture](../images/wazuh-lab-architecture.png)
+![Lab architecture](../investigations/Images/wazuh-lab-architecture.png)
 
 Three machines, all on the same home network so they can see each other:
 
@@ -33,16 +33,13 @@ At some point I decided the operating system wasn't the point of the exercise. T
 
 I'd still like Windows telemetry in here eventually, but not at the cost of another evening staring at a blank window.
 
-**Screenshot: both machines pinging each other**
-`![Connectivity between VMs](../images/ping-connectivity.png)`
+![Connectivity between VMs](../investigations/Images/ping-connectivity.png)
 
 That ping is the first thing worth checking and the thing I'd check first if anything broke later. Both VMs are on bridged adapters, so they're real devices on the home network rather than hidden behind NAT. Without that, none of the rest works.
 
-**Screenshot: deploy new agent wizard**
-`![Agent deployment configuration](../images/agent-deploy-wizard.png)`
+![Agent deployment configuration](../investigations/Images/agent-deploy-wizard.png)
 
-**Screenshot: agent showing active**
-`![Agent connected](../images/agent-active.png)`
+![Agent connected](../investigations/Images/agent-active.png)
 
 Agent 001, Ubuntu 24.04.4, active. That's the platform up and something reporting into it.
 
@@ -64,8 +61,7 @@ for i in {1..10}; do ssh -o StrictHostKeyChecking=no -o PreferredAuthentications
 
 Ten attempts against a username that doesn't exist, run from a different machine. Running it from the host rather than from the Ubuntu box itself matters — I wanted the source IP in the alerts to be genuinely external to the endpoint, the way it would be in a real intrusion.
 
-**Screenshot: Threat Hunting dashboard**
-`![Threat Hunting dashboard](../images/threat-hunting-dashboard.png)`
+![Threat Hunting dashboard](../investigations/Images/threat-hunting-dashboard.png)
 
 The MITRE panel picked it up immediately — Password Guessing and SSH.
 
@@ -73,8 +69,7 @@ The MITRE panel picked it up immediately — Password Guessing and SSH.
 
 **Rule 5710 — "sshd: Attempt to login using a non-existent user", level 5.**
 
-**Screenshot: 5710 alert detail**
-`![Rule 5710 alert](../images/alert-5710.png)`
+![Rule 5710 alert](../investigations/Images/alert-5710.png)
 
 The useful fields:
 
@@ -89,11 +84,9 @@ Level 5 is low, and it should be. One failed login is a person mistyping their p
 
 **Rule 5712 — "sshd: brute force trying to get access to the system", level 10.**
 
-**Screenshot: repeated alerts in the events list**
-`![Repeated authentication failures](../images/repeated-failures.png)`
+![Repeated authentication failures](../investigations/Images/repeated-failures.png)
 
-**Screenshot: 5712 brute force alert**
-`![Rule 5712 brute force](../images/alert-5712.png)`
+![Rule 5712 brute force](../investigations/Images/alert-5712.png)
 
 This is the interesting one:
 
@@ -139,8 +132,7 @@ sudo nano /var/ossec/etc/ossec.conf
 
 This is the agent's main config — the single place that defines what that machine collects and forwards. Inside it, the `<syscheck>` block controls file integrity monitoring: which directories to watch, how often, and which attributes to check.
 
-**Screenshot: syscheck block before editing**
-`![Default syscheck configuration](../images/syscheck-before.png)`
+![Default syscheck configuration](../investigations/Images/syscheck-before.png)
 
 By default it watches system directories like `/etc`, `/usr/bin` and `/boot` on a twelve-hour schedule. I added my own:
 
@@ -150,15 +142,13 @@ By default it watches system directories like `/etc`, `/usr/bin` and `/boot` on 
 
 `realtime="yes"` means alerts fire on change rather than waiting for the next scheduled scan. `check_all="yes"` watches size, permissions, ownership and a content hash.
 
-**Screenshot: syscheck block with my directory added**
-`![Custom directory added](../images/syscheck-after.png)`
+![Custom directory added](../investigations/Images/syscheck-after.png)
 
 ### Then it broke
 
 The agent wouldn't restart.
 
-**Screenshot: agent restart failure**
-`![Agent failed to start](../images/agent-restart-error.png)`
+![Agent failed to start](../investigations/Images/agent-restart-error.png)
 
 `journalctl` only told me the process had exited with status 1, which wasn't much help. Testing the config directly was more useful:
 
@@ -206,8 +196,7 @@ sudo rm /opt/customer-records/passwords.txt
 
 A modification, an addition, a deletion.
 
-**Screenshot: syscheck events**
-`![File integrity events](../images/syscheck-events.png)`
+![File integrity events](../investigations/Images/syscheck-events.png)
 
 All three came through:
 
@@ -219,11 +208,9 @@ All three came through:
 
 Note the severity split. Modifying or deleting an existing file is level 7; adding a new one is level 5. Wazuh treats changing something that was already there as more significant than creating something new, which is a reasonable default — most attacks alter or destroy existing data rather than simply adding to it.
 
-**Screenshot: event details**
-`![FIM alert detail](../images/fim-alert-detail.png)`
+![FIM alert detail](../investigations/Images/fim-alert-detail.png)
 
-**Screenshot: full log showing the modification**
-`![File modification full log](../images/fim-full-log.png)`
+![File modification full log](../investigations/Images/fim-full-log.png)
 
 The fields that matter here are the before and after hashes. FIM computes a checksum of each watched file, so when the file changes you get both values in the alert. That's the difference between knowing a file was touched and proving its contents are different — a timestamp can be changed trivially, a content hash can't.
 
